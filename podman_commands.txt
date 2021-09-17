@@ -1,0 +1,72 @@
+Podman commands:
+	sudo podman run -d quay.io/imagname:tag --> to create and start the container from an image in quay.io registry.
+		-d to run it in background.
+		-it to start it interactively
+	
+	sudo podman exec -it imagename /bin/bash
+		To start bash session inside container imagename
+	
+	sudo podman run --name mysql-basic -e MYSQL_USER=u1 -e MYSQL_PASSWORD=p1 -d rhscl/mysqlimage:5.7
+		Use -e to pass the environment variables to the container
+
+	sudo podman run -v /var/db:/var/lib/sqldb rhscl/mysqlimage:5.7
+		Use -v to mount host directory (/var/db) into container (/var/lib/sqldb)
+
+	sudo podman run -d -p 8080:80 rhscl/httpd-24-rhel7:2.4
+		Use -p for port forwarding from host port (8080) to container port (80)
+	
+	sudo podman run -d -p 172.27.34.36:8081:80 rhscl/httpd-24-rhel7:2.4
+		You can specify ip to forward requests only from specific IP and port
+
+	sudo podman ps --> to list actively running containers
+	sudo podman ps -a --> to list ALL containers including stopped ones
+	
+	sudo podman inspect my-httpd-container 	--> To get metadata json about the specifed container
+	
+	sudo podman stop my-httpd-container	--> To gracefully stop a container
+
+	sudo podman kill my-httpd-container	--> To send SIGKILL signal to forcefull stop a container
+	
+	sudo podman rm my-httpd-container	--> To delete a container if it's stopped
+	
+	sudo podman rm -f my-httpd-container	--> Equivalent to podman kill + podman rm. Kills the container forcefully and then deletes it.
+	
+	sudo podman restart my-htpp-container	--> To restart a stopped container
+	
+	sudo podman pull rhscl/mysql-57-rhel7 	--> To pull image from remote registry
+
+	sudo podman login -u username -p passwd registry.access.redhat.com	--> to login to a remote registry
+
+	sudo podman images 	--> to list locally stored container images			
+
+	sudo podman search mysql --> to search mysql images in registries
+
+	sudo podman save -o mysql.tar registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7
+		To save mysql container image into mysql.tar file
+	
+	sudo podman load -i mysql.tar --> to load a container image from the tar file.
+
+	sudo podman rmi mysql-57-rhel7:5.7 --> to delete an image only if it's not being used by any running containers
+	sudo podman rmi -f mysql-57-rhel7:5.7 --> to forcefully remove the image. All containers using the image are first stopped and removed.
+	sudo podman rmi -a --> to delete all images that are unused by containers.
+	
+	sudo podman diff container-name (or container ID)	--> to see the added, changed or deleted files to the container file system.
+		Use podman inspect to see the files from the mounted directories.
+	
+	sudo podman tag do180-custom-httpd quay.io/${RHT_OCP4_QUAY_USER}/do180-custom-httpd:v1.0
+	sudo podman tag mysql-custom devops/mysql
+		To tag the image devops/mysql:latest as mysql-custom
+		
+	sudo podman rmi devops/mysql --> to remove the image and all tags associated with it.
+	
+	sudo podman push quay.io/bitnami/nginx --> to push bitnami/nginx image to quay.io registry
+
+	sudo podman tag do180-custom-httpd quay.io/${RHT_OCP4_QUAY_USER}/do180-custom-httpd:v1.0 --> to tag do180-custom-httpd with quay.io registry host
+	sudo podman push quay.io/${RHT_OCP4_QUAY_USER}/do180-custom-httpd:v1.0 --> to push the tagged image to its registry
+	sudo podman pull quay.io/${RHT_OCP4_QUAY_USER}/do180-custom-httpd:v1.0 --> to pull the tagged image from its registry
+
+	sudo podman stop container-name
+
+	podman build -t Name:TAG DIR
+	sudo podman build --layers=false -t do180/apache .	--> to build do180/apache image from dockerfile in the local directory.
+		layers=false --> to instruct podman to delete intermediate images created by podman
