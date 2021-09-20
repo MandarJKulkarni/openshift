@@ -1,0 +1,98 @@
+OC commands
+
+oc login <clusterurl>
+	To login to the cluster, required before running other oc commands
+
+Use oc port-forward command for forwarding a local port to a pod port
+e.g. oc port-forward mysql-openshift-1-glqrp 3306:3306
+
+oc new-app mysql --as-deployment-config MYSQL_USER=user MYSQL_PASSWORD=pass MYSQL_DATABASE=testdb -l db=mysql
+	creates an application based on an image, mysql, from Docker Hub, with the label set to db=mysql
+
+oc new-app --docker-image=myregistry.com/mycompany/myapp --name=myapp --as-deployment-config
+	creates an application based on an image from a private Docker image registry
+
+oc new-app https://github.com/openshift/ruby-hello-world --name=ruby-hello --as-deployment-config
+	creates an application based on source code stored in a Git repository
+
+
+oc get RESOURCE_TYPE == kubectl get RESOURCE_TYPE
+
+	displays a summary of all resources of the specified type
+	e.g. oc get pods
+
+oc get svc,dc -l app=nexus == kubectl get RESOURCE_TYPE -l app-=xyz
+	-l is used to retrieve objects that have matching labels
+
+oc describe RESOURCE_TYPE RESOURCE_NAME == kubectl describe RESOURCE_TYPE RESOURCE_NAME
+	provides more details about the specified resource of the specified type
+	e.g. oc describe pod mysql-openshift-1-glqrp
+
+oc get RESOURCE_TYPE RESOURCE_NAME -o yaml == kubectl get RESOURCE_TYPE RESOURCE_NAME -o yaml
+oc get RESOURCE_TYPE RESOURCE_NAME -o json
+	To export a resource definition
+	e.g. oc get pod mysql-openshift-1-glqrp	-o json
+
+oc create == kubectl create
+	creates resources from a definition
+
+oc edit resource_type resource_name == kubectl edit resource_type resource_name
+	allows editing the resource by opening a vi buffer containing resource definition
+
+oc delete resource_type resource_name == kubectl delete resource_type resource_name
+	deletes the specified resource with the name
+
+oc exec CONTAINER_ID options command	== kubectl exec -it container_ID /bin/bash
+	executes commands inside a container.
+
+oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API} 
+	To login to Openshift cluster
+
+oc new-project ${RHT_OCP4_DEV_USER}-mysql-openshift
+	To create new project (or new K8S namespace)
+
+oc new-app --as-deployment-config --docker-image=registry.access.redhat.com/rhscl/mysql-57-rhel7:latest --name=mysql-openshift -e MYSQL_USER=user1 -e MYSQL_PASSWORD=mypa55
+	Create new application from container image and pass env variables to it
+
+oc status
+	to view the status of the new application 
+
+oc expose service mysql-openshift
+	to expose the service by creating a route
+
+oc delete project ${RHT_OCP4_DEV_USER}-mysql-openshift
+	deletes the project to remove all the resources within the project (k8s namespace)
+
+oc get pod --all-namespaces -l app=router
+	to get router service pod summary
+
+oc new-app --as-deployment-config php:7.3~https://github.com/${RHT_OCP4_GITHUB_USER}/DO180-apps --context-dir php-helloworld --name php-helloworld
+	use --context-dir to point to a folder in github repo
+
+oc get is -n openshift
+	To see all available image streams
+  
+oc new-app --as-deployment-config php~http://my.githubserver.com/my-app --name=myapp
+	Use tilde like in example above to specify image stream like php
+new-app command takes -i as parameter to point to a specific image stream
+e.g. oc new-app --as-deployment-config -i php http://myservices.example.com/app --name=myapp
+
+oc new-app --as-deployment-config \ https://github.com/openshift/sti-ruby.git \ --context-dir=2.0/test/puma-test-app
+	Use context-dir option to take code from a folder in a repo
+oc new-app --as-deployment-config \ https://github.com/openshift/ruby-hello-world.git#beta4
+	To take code from branch beta4
+
+redirect the output of oc new-app command to get json listing the resources created like buildconfig, deploymentconfig, imagestream etc.
+	 oc -o json new-app --as-deployment-config php~http://services.lab.example.com/app --name=myapp > s2i.json
+
+oc get builds
+	To get the list of application builds
+
+oc logs build/mysvc-1
+	To see the logs of a specific build. This command shows last few lines from log.
+
+To trigger new build for a buildconfig, use oc start-build build_config_name command.
+	e.g. use oc get buildconfig to get available buildconfigs then oc start-build bc_name to start a particular build
+
+oc logs --all-containers -f python-helloworld-1-build
+	To look at logs for a build pod with name python-helloworld-1-build
