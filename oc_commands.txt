@@ -17,7 +17,6 @@ oc new-app https://github.com/openshift/ruby-hello-world --name=ruby-hello --as-
 
 
 oc get RESOURCE_TYPE == kubectl get RESOURCE_TYPE
-
 	displays a summary of all resources of the specified type
 	e.g. oc get pods
 
